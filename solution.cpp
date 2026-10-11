@@ -7,31 +7,6 @@ using namespace std;
 
 double dp[25][25]; // dp[k][eaten] = expected remaining days when we have k apples left and have eaten 'eaten' apples so far
 
-double solve(int k, int eaten, int m) {
-    if (dp[k][eaten] >= -0.5) return dp[k][eaten];
-    
-    if (eaten >= m) {
-        dp[k][eaten] = 0;
-        return 0;
-    }
-    
-    if (k == 0) {
-        dp[k][eaten] = 1e9; // impossible to eat more if no apples left
-        return 1e9;
-    }
-    
-    double expected = 1.0; // current day
-    double sum = 0.0;
-    
-    for (int i = 1; i <= k; i++) {
-        sum += solve(k - i, min(eaten + i, m), m);
-    }
-    
-    expected += sum / k;
-    dp[k][eaten] = expected;
-    return expected;
-}
-
 int main() {
     int n, m;
     cin >> n >> m;
@@ -39,11 +14,31 @@ int main() {
     // Initialize DP table
     for (int i = 0; i <= 20; i++) {
         for (int j = 0; j <= 20; j++) {
-            dp[i][j] = -1.0;
+            dp[i][j] = 0.0;
         }
     }
     
-    double result = solve(n, 0, m);
+    // Base case: if we've already eaten m or more apples, expected remaining days is 0
+    for (int k = 0; k <= n; k++) {
+        for (int eaten = m; eaten <= n; eaten++) {
+            dp[k][eaten] = 0.0;
+        }
+    }
+    
+    // Fill DP table bottom-up
+    for (int eaten = m - 1; eaten >= 0; eaten--) {
+        for (int k = 1; k <= n; k++) {
+            double sum = 0.0;
+            for (int i = 1; i <= k; i++) {
+                int new_eaten = min(eaten + i, n);
+                int new_k = k - i;
+                sum += dp[new_k][new_eaten];
+            }
+            dp[k][eaten] = 1.0 + sum / k;
+        }
+    }
+    
+    double result = dp[n][0];
     
     cout << fixed << setprecision(2) << result << endl;
     
