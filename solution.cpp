@@ -22,21 +22,17 @@ double solve(int k, int t) {
     
     double expected = 1.0; // current day
     double sum = 0.0;
-    int valid_options = 0;
     
     for (int i = 1; i <= k; i++) {
         if (t - i >= 0) {
             sum += solve(k - i, t - i);
-            valid_options++;
+        } else {
+            // If we eat more than needed, we still count this day but stop
+            sum += 0;
         }
     }
     
-    if (valid_options > 0) {
-        expected += sum / k;
-    } else {
-        expected = 1e9; // impossible
-    }
-    
+    expected += sum / k;
     dp[k][t] = expected;
     return expected;
 }
