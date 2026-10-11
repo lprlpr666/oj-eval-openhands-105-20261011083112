@@ -5,18 +5,18 @@
 
 using namespace std;
 
-double dp[25][25]; // dp[k][t] = expected days to eat exactly t apples starting from k apples
+double dp[25][25]; // dp[k][eaten] = expected remaining days when we have k apples left and have eaten 'eaten' apples so far
 
-double solve(int k, int t) {
-    if (dp[k][t] >= -0.5) return dp[k][t];
+double solve(int k, int eaten, int m) {
+    if (dp[k][eaten] >= -0.5) return dp[k][eaten];
     
-    if (t == 0) {
-        dp[k][t] = 0;
+    if (eaten >= m) {
+        dp[k][eaten] = 0;
         return 0;
     }
     
     if (k == 0) {
-        dp[k][t] = 1e9; // impossible
+        dp[k][eaten] = 1e9; // impossible to eat more if no apples left
         return 1e9;
     }
     
@@ -24,16 +24,11 @@ double solve(int k, int t) {
     double sum = 0.0;
     
     for (int i = 1; i <= k; i++) {
-        if (t - i >= 0) {
-            sum += solve(k - i, t - i);
-        } else {
-            // If we eat more than needed, we still count this day but stop
-            sum += 0;
-        }
+        sum += solve(k - i, min(eaten + i, m), m);
     }
     
     expected += sum / k;
-    dp[k][t] = expected;
+    dp[k][eaten] = expected;
     return expected;
 }
 
@@ -48,7 +43,7 @@ int main() {
         }
     }
     
-    double result = solve(n, m);
+    double result = solve(n, 0, m);
     
     cout << fixed << setprecision(2) << result << endl;
     
