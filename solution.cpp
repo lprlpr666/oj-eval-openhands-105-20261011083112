@@ -30,9 +30,13 @@ int main() {
         for (int k = 1; k <= n; k++) {
             double sum = 0.0;
             for (int i = 1; i <= k; i++) {
-                int new_eaten = min(eaten + i, n);
+                int new_eaten = eaten + i;
                 int new_k = k - i;
-                sum += dp[new_k][new_eaten];
+                if (new_eaten >= m) {
+                    sum += 0.0; // we're done
+                } else {
+                    sum += dp[new_k][new_eaten];
+                }
             }
             dp[k][eaten] = 1.0 + sum / k;
         }
